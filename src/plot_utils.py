@@ -36,12 +36,12 @@ def plot_feature(df, feature, timeseries=None, show_legend=False, title=None):
         plt.legend()
 
 def crossplot_pred(pred, true):
-    total_min = min(np.array(pred).min(), np.array(true).min())
-    total_max = max(np.array(pred).max(), np.array(true).max())
+    total_min = min(np.nanmin(pred), np.nanmin(true))
+    total_max = max(np.nanmax(pred), np.nanmax(true))
     plt.scatter(np.array(pred), np.array(true), s=1)
     plt.plot((total_min, total_max), (total_min, total_max), c='r')
     plt.xlim(total_min, total_max)
     plt.ylim(total_min, total_max)
     plt.xlabel("Predict")
     plt.ylabel("True")
-    plt.title(f"MAE: {np.abs(np.array(pred) - np.array(true)).mean():.3f}")
+    plt.title(f"MAE: {np.nanmean(np.abs(np.array(pred) - np.array(true))):.3f}")
