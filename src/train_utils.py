@@ -31,8 +31,8 @@ class TorchDataset(Dataset):
                 index_count += 1
 
 
-def create_dataloader(df, scaled_data, target, batch_size=16, shuffle=True, drop_last=True,
-                      num_workers=0, window_size=30):
+def create_dataloader(df, scaled_data, target, batch_size=16, shuffle=True, drop_last=True, num_workers=0,
+                      window_size=30):
     torchdataset = TorchDataset(df=df, scaled_data=scaled_data, target=target, window_size=window_size)
     return DataLoader(torchdataset, batch_size=batch_size, shuffle=shuffle, num_workers=num_workers,
                       drop_last=drop_last)
@@ -41,30 +41,26 @@ def create_dataloader(df, scaled_data, target, batch_size=16, shuffle=True, drop
 def train(model, n_epochs, train_dataloader, optimizer, criterion, test_dataloader=None, verbose=True):
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     model = model.to(device)
-    best_model = None
     train_loss = []
     test_loss = []
     for epoch in range(1, n_epochs + 1):
         start_time = time.time()
         model.train()
         loss_list = []
-        ttf_list = []
         for data, target, _ in train_dataloader:
             data = data.to(device)
             target = target.to(device)
-            predict = model(data)
-            loss = criterion(predict, target)
+            predicted = model(data)
+            loss = criterion(predicted, target)
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
             loss_list.append(loss.detach().cpu().mean())
-            break
         train_loss.append(np.nanmean(loss_list))
 
         model.eval()
         if test_dataloader is not None:
             test_loss_list = []
-            ttf_list = []
             for data, target, _ in test_dataloader:
                 data = data.to(device)
                 target = target.to(device)
@@ -77,6 +73,7 @@ def train(model, n_epochs, train_dataloader, optimizer, criterion, test_dataload
                   f'train_loss: {train_loss[-1]:.3f}, '
                   f'test_loss: {test_loss[-1]:.3f}, '
                   f'Time: {time.time() - start_time:.3f}')
+
 
 def predict(model, test_dataloader, batch_size=256):
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
