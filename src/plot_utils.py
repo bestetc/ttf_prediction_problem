@@ -21,12 +21,13 @@ def plot_groupby(df, stats, by='id', show_labels=False):
     if show_labels:
         plt.legend()
 
+
 def plot_feature(df, feature, timeseries=None, show_legend=False, title=None):
-    timeseries_lenght = [df[df['id'] == i]['cycle'].max() for i in df.id.unique()]
+    timeseries_length = [df[df['id'] == i]['cycle'].max() for i in df.id.unique()]
     iter_ = df.id.unique() if timeseries is None else timeseries
     for i in iter_:
         plt.plot(np.arange(max(timeseries_lenght), 0, -1),
-                 np.pad(df[feature][df.id == i], (max(timeseries_lenght) - df[df['id'] == i]['cycle'].max(), 0),
+                 np.pad(df[feature][df.id == i], (max(timeseries_length) - df[df['id'] == i]['cycle'].max(), 0),
                         constant_values=np.nan),
                  label=i)
     plt.gca().invert_xaxis()
@@ -34,6 +35,7 @@ def plot_feature(df, feature, timeseries=None, show_legend=False, title=None):
     plt.title(title)
     if show_legend:
         plt.legend()
+
 
 def crossplot_pred(pred, true):
     total_min = min(np.nanmin(pred), np.nanmin(true))

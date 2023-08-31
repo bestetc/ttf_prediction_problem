@@ -7,8 +7,7 @@ class TimeSeriesTransformer(nn.Module):
                  add_sigmoid=False):
         super().__init__()
         layers = nn.TransformerEncoderLayer(d_model=d_model, nhead=nhead, dim_feedforward=dim_feedforward,
-                                            dropout=dropout,
-                                            batch_first=True)
+                                            dropout=dropout, batch_first=True)
         self.encoder = nn.TransformerEncoder(layers, num_layers=num_encoder_layers)
         self.linear = nn.Linear(d_model * window_size, 1)
         self.sigmoid = nn.Sigmoid()

@@ -2,18 +2,19 @@ import torch
 from torch import nn
 
 
-class AsymmetricBCELoss(torch.nn.Module):
+class AsymmetricBCELoss(nn.Module):
     def __init__(self, scale=2.0):
         super().__init__()
         self.scale = scale
 
     def forward(self, predict, target):
+        predict = predict.view((-1, 1))
         target = target.view((-1, 1))
         loss = -self.scale * target * torch.log(predict) - (1 - target) * torch.log((1 - predict))
         return loss.mean()
 
 
-class AsymmetricMSELoss(torch.nn.Module):
+class AsymmetricMSELoss(nn.Module):
     def __init__(self, scale=2.0):
         super().__init__()
         self.scale = scale
