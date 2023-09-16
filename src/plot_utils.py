@@ -26,7 +26,7 @@ def plot_feature(df, feature, timeseries=None, show_legend=False, title=None):
     timeseries_length = [df[df['id'] == i]['cycle'].max() for i in df.id.unique()]
     iter_ = df.id.unique() if timeseries is None else timeseries
     for i in iter_:
-        plt.plot(np.arange(max(timeseries_lenght), 0, -1),
+        plt.plot(np.arange(max(timeseries_length), 0, -1),
                  np.pad(df[feature][df.id == i], (max(timeseries_length) - df[df['id'] == i]['cycle'].max(), 0),
                         constant_values=np.nan),
                  label=i)

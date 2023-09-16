@@ -17,9 +17,13 @@ class TimeSeriesTransformer(nn.Module):
         self.add_sigmoid = add_sigmoid
 
     def forward(self, x):
+        # print(f'before encoder: {x.mean()}')
         x = self.encoder(x)
+        # print(f'after encoder: {x.mean()}')
         x = x.view(-1, self.d_model * self.window_size)
         x = self.linear(x)
+        # print(f'after linear: {x.mean()}')
         if self.add_sigmoid:
             x = self.sigmoid(x)
+        # print(f'out: {x.mean()}')
         return x

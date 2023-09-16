@@ -41,8 +41,6 @@ def create_dataloader(df, scaled_data, target, batch_size=16, shuffle=True, drop
 def train(model, n_epochs, train_dataloader, optimizer, criterion, test_dataloader=None, verbose=True):
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     model = model.to(device)
-    train_loss = []
-    test_loss = []
     for epoch in range(1, n_epochs + 1):
         start_time = time.time()
         model.train()
@@ -56,7 +54,7 @@ def train(model, n_epochs, train_dataloader, optimizer, criterion, test_dataload
             loss.backward()
             optimizer.step()
             loss_list.append(loss.detach().cpu().mean())
-        train_loss.append(np.nanmean(loss_list))
+        train_loss = np.mean(loss_list)
 
         model.eval()
         if test_dataloader is not None:
@@ -66,21 +64,22 @@ def train(model, n_epochs, train_dataloader, optimizer, criterion, test_dataload
                 target = target.to(device)
                 predicted = model(data)
                 test_loss_list.append(criterion(predicted, target).detach().cpu().mean())
-            test_loss.append(np.nanmean(np.array(test_loss_list)))
+            test_loss = np.mean(np.array(test_loss_list))
 
         if verbose:
-            print(f'epoch: {epoch}/{n_epochs}, '
-                  f'train_loss: {train_loss[-1]:.3f}, '
-                  f'test_loss: {test_loss[-1]:.3f}, '
-                  f'Time: {time.time() - start_time:.3f}')
+            text = f'epoch: {epoch}/{n_epochs}, train_loss: {train_loss:.3f},'
+            if test_dataloader is not None:
+                text += f'test_loss: {test_loss:.3f}, '
+            text += f'Time: {time.time() - start_time:.3f}'
+            print(text)
 
 
-def predict(model, test_dataloader, batch_size=256):
+def predict(model, dataloader, batch_size=256):
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    len_ds = len(test_dataloader.dataset.index)
+    len_ds = len(dataloader.dataset.index)
     model.eval()
     predicted, ds_index = np.empty(len_ds), np.empty(len_ds, dtype=int)
-    for i, (data, target, idx) in enumerate(test_dataloader):
+    for i, (data, target, idx) in enumerate(dataloader):
         i = np.arange(i * batch_size, i * batch_size + len(idx))
         data = data.to(device)
         model_predict = model(data).detach().cpu().squeeze()
